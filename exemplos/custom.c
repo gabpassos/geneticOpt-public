@@ -91,6 +91,9 @@ static PyMethodDef Custom_methods[] = {
     {"name", (PyCFunction) Custom_name, METH_NOARGS,
      "Return the name, combining the first and last name"
     },
+    {"alterar", (PyCFunction) Custom_init, METH_VARARGS|METH_KEYWORDS,
+     "Return the name, combining the first and last name"
+    },
     {NULL}  /* Sentinel */
 };
 

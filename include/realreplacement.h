@@ -1,7 +1,7 @@
 #ifndef REALREPLACEMENT_H_INCLUDED
 #define REALREPLACEMENT_H_INCLUDED
 
-#include "genericmodeldata.h"
+#include "stdgen.h"
 
 typedef void realReplacementFunction();
 

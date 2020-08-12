@@ -7,7 +7,7 @@
 #include <Python.h>
 #include "structmember.h"
 
-#include "genericmodeldata.h"
+#include "stdgen.h"
 #include "realcrossover.h"
 #include "realmutation.h"
 #include "realreplacement.h"

@@ -4,6 +4,8 @@
 #define MAX_CHROM_STRLEN 5
 #define MAX_TYPE_STRLEN 16
 
+#include "stdmath.h"
+
 typedef struct population
 {
     unsigned int size;
@@ -31,6 +33,8 @@ typedef struct realchromosome
     double *gene;
 
     unsigned int gen;
+
+    boolean evaluated;
 } realChromosome;
 
 #endif

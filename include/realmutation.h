@@ -1,7 +1,7 @@
 #ifndef REALMUTATION_H_DEFINED
 #define REALMUTATION_H_DEFINED
 
-#include "genericmodeldata.h"
+#include "stdgen.h"
 
 typedef void realMutationFunction();
 

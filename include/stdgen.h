@@ -27,14 +27,20 @@ typedef struct chromosome
     double *infLimit;
 } chromosomeData;
 
+/********************************************************************************************************************************************/
+/**************
+ * REAL MODEL *
+ * ************/
 typedef struct realchromosome
 {
     double fit;
     double *gene;
 
-    unsigned int gen;
+    unsigned int generation;
 
     boolean evaluated;
 } realChromosome;
+
+void copyRealChromosome(realChromosome *dest, realChromosome *src, chromosomeData *chromosome);
 
 #endif

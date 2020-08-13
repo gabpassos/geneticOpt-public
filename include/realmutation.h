@@ -3,13 +3,18 @@
 
 #include "stdgen.h"
 
-typedef void realMutationFunction();
+typedef void realMutationFunction(realChromosome *ind, realMutationModel *mutation, chromosomeData *chromosome);
 
 typedef struct realmutationmodel
 {
     char type[MAX_TYPE_STRLEN];
     realMutationFunction *function;
     double prob;
-}realMutationModel;
+    double alleleMutProb;
+    double **limit;
+} realMutationModel;
+
+void realTotalUniformRandomMutation(realChromosome *ind, realMutationModel *mutation, chromosomeData *chromosome);
+void realUniformRandomMutation(realChromosome *ind, realMutationModel *mutation, chromosomeData *chromosome);
 
 #endif

@@ -6,6 +6,8 @@
 
 #include "stdmath.h"
 
+typedef enum obj {min = 0, max = 1} objective;
+
 typedef struct population
 {
     unsigned int size;

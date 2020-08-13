@@ -31,6 +31,7 @@ typedef struct chromosome
 /**************
  * REAL MODEL *
  * ************/
+
 typedef struct realchromosome
 {
     double fit;

@@ -2,6 +2,7 @@
 #define STDMATH_H_INCLUDED
 
 #include <stdlib.h>
+#include <limits.h>
 
 #define uniform(a, b) (double) (b - a)*rand()/RAND_MAX + a
 

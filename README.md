@@ -1,22 +1,38 @@
 # geneticOpt
-Genetic algorithms for Python.
+The main idea of this project is develop a Python module for totally customizable genetic algorithms. This library will allow since basic to advanced users create their own genetic models in easy way. Focusing on computational performance, this module will be developed entirely in C language.
 
-## Ideia inicial de implementação (Genético mono-objetivo)
-### Codificação:
-- Binária
-- Inteira
-- Real
+## The module in its first version
+This module will initially suport the following components:
 
-### Inicialização:
-- Aleatória
+### Objective Function
+Will be an exclusively user defined component. The user defines a Python function that evaluates an individual of the population.
 
-### Seleção:
-- Torneio
-- Roleta
+### Representation
+This module will suport the basic representation methods:
+- Binary.
+- Integer.
+- Real.
 
-### Crossover:
-- Crossover de 1 ponto
-- Crossover de 2 pontos
+### Population Initialization
+Initially, this module will suport only random and heuristic initialization methods. The heuristic initialization will be a user defined Python function, like the objective function.
 
-### Mutação:
-- Mutação aleatória uniforme
+### Selection Strategy
+Some classical selection methods:
+- Roulett Wheel Selection.
+- Tournament Selection.
+- Rank-Based Selection.
+
+### Reproduction Strategy
+The usual reproduction strategies in genetic algorithms are:
+- Crossover.
+- Mutation.
+
+These methods are very important and can be developed in many ways. Some classical aproachs are:
+- n-point Crossover.
+- Aritmethic Crossover.
+- Uniform Random Mutation.
+
+### Replacement Strategy
+Initially, this module suports only the elitist replacement strategy (only de best individuas from the initial population and its offsprings survives to the next generation.)
+
+## Some ideas for future releases

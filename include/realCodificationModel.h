@@ -8,6 +8,7 @@
 #include "structmember.h"
 
 #include "stdgen.h"
+#include "realselection.h"
 #include "realcrossover.h"
 #include "realmutation.h"
 #include "realreplacement.h"

@@ -27,7 +27,7 @@ The usual reproduction strategies in genetic algorithms are:
 - Crossover.
 - Mutation.
 
-These methods are very important and can be developed in many ways. Some classical aproachs are:
+These methods are very important and can be developed in many ways. Some classical approachs are:
 - n-point Crossover.
 - Aritmethic Crossover.
 - Uniform Random Mutation.

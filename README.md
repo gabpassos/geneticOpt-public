@@ -33,7 +33,7 @@ These methods are very important and can be developed in many ways. Some classic
 - Uniform Random Mutation.
 
 ### Replacement Strategy
-Initially, this module suports only the elitist replacement strategy (only de best individuas from the initial population and its offsprings survives to the next generation.)
+Initially, this module suports only the elitist replacement strategy (only the best individuas from the initial population and its offsprings survives to the next generation.)
 
 ## Some ideas for future releases
 - Develop some tools for statistical analysis of the genetic model defined by the user. The objective of these tools are allow the user to modify his genetic model and tune the genetic parameters.

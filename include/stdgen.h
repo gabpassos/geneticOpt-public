@@ -22,7 +22,7 @@ typedef struct population
 
 typedef struct chromosome
 {
-    char type[MAX_CHROM_STRLEN]; //"bin", "int", "real"
+    char *type; //"bin", "int", "real"
     unsigned int length;
 
     double *supLimit;

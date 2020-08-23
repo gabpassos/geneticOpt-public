@@ -7,7 +7,7 @@ typedef void realMutationFunction(realChromosome *ind, realMutationModel *mutati
 
 typedef struct realmutationmodel
 {
-    char type[MAX_TYPE_STRLEN];
+    char *type;
     realMutationFunction *function;
     double prob;
     double alleleMutProb;

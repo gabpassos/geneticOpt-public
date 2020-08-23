@@ -8,7 +8,7 @@ typedef int realCompareFunction(const void *a, const void *b);
 
 typedef struct realreplacementmodel
 {
-    char type[MAX_TYPE_STRLEN];
+    char *type;
     realReplacementFunction *function;
     realCompareFunction *srcPopOrdFunction;
 } realReplacementModel;

@@ -7,7 +7,7 @@ typedef void realCrossoverFunction(realChromosome ***parents, realChromosome *to
 
 typedef struct realcrossovermodel
 {
-    char type[MAX_TYPE_STRLEN];
+    char *type;
     realCrossoverFunction *function;
     double prob;
     unsigned int nPoint;

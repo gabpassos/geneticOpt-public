@@ -30,6 +30,12 @@ typedef struct realgeneticmodel
     realCrossoverModel crossover;
     realMutationModel mutation;
     realReplacementModel replacement;
+
+    unsigned int seed;
 } realGeneticModelObject;
+
+static PyObject * defaultNewRealGeneticModel(PyTypeObject *type, PyObject *args, PyObject *kwds);
+static int usrInitRealGeneticModel(realGeneticModelObject *self, PyObject *args, PyObject *kwds);
+static PyObject * realGeneticModelSolver(PyObject *self, PyObject *Py_UNUSED(ignored));
 
 #endif

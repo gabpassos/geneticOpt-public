@@ -1,10 +1,11 @@
 #ifndef GENERICMODELDATA_H_INCLUDED
 #define GENERICMODELDATA_H_INCLUDED
 
+#include "stdmath.h"
+
 #define MAX_CHROM_STRLEN 5
 #define MAX_TYPE_STRLEN 16
-
-#include "stdmath.h"
+#define DEFAULT_CHROM_LIMIT 1000
 
 typedef enum obj {min = 0, max = 1} objective;
 
@@ -22,7 +23,7 @@ typedef struct population
 
 typedef struct chromosome
 {
-    char *type; //"bin", "int", "real"
+    char *type;
     unsigned int length;
 
     double *supLimit;

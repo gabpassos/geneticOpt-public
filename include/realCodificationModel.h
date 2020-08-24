@@ -8,6 +8,7 @@
 #include "structmember.h"
 
 #include "stdgen.h"
+#include "realinitialization.h"
 #include "realselection.h"
 #include "realcrossover.h"
 #include "realmutation.h"
@@ -24,6 +25,8 @@ typedef struct realgeneticmodel
     populationData population;
     chromosomeData chromosome;
 
+    realInitializationModel initialization;
+    realSelectionModel selection;
     realCrossoverModel crossover;
     realMutationModel mutation;
     realReplacementModel replacement;

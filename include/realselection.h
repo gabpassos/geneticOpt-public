@@ -3,24 +3,31 @@
 
 #include "stdgen.h"
 
+typedef enum realselecttype
+{
+    realSelect_type_undef = 0,
+    realTwoParentsTournament = 1,
+    realnParentsTournament = 2
+} realSelectType;
+
+typedef struct tournamentmodel tournamentModel;
+
+typedef realChromosome* tournamentFunction(tournamentModel *model, realChromosome *srcPopulation);
 typedef void realSelectionFunction(realChromosome ***parents, realChromosome *srcPopulation, populationData *population, realSelectionModel *model);
 
 typedef struct realselectionmodel
 {
-    char *type;
+    realSelectType type;
     realSelectionFunction *function;
-    tournamentModel tourModel;   
-
+    tournamentModel tourModel;
 } realSelectionModel;
 
 typedef struct tournamentmodel
 {
     int tourSize;
     int *tourGroup;
-    realChromosome* (*function)(tournamentModel *model, realChromosome *srcPopulation); //Function of tournamentFunction type.
+    tournamentFunction *function;
 } tournamentModel;
-
-typedef realChromosome* tournamentFunction(tournamentModel *model, realChromosome *srcPopulation);
 
 realChromosome* minTournament(tournamentModel *model, realChromosome *srcPopulation);
 realChromosome* maxTournament(tournamentModel *model, realChromosome *srcPopulation);

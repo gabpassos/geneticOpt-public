@@ -9,6 +9,6 @@
 typedef enum Boolean
 {
     False = 0,
-    True = 1,
+    True = 1
 } boolean;
 #endif

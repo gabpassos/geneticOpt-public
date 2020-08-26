@@ -7,7 +7,20 @@
 #define MAX_TYPE_STRLEN 16
 #define DEFAULT_CHROM_LIMIT 1000
 
-typedef enum obj {min = 0, max = 1} objective;
+typedef enum obj
+{
+    undef = 0,
+    min = 1,
+    max = 2
+} objective;
+
+typedef enum chrom_type
+{
+    chrom_type_undef = 0,
+    bin = 1,
+    integer = 2,
+    real = 3
+} chromosomeType;
 
 typedef struct population
 {
@@ -23,7 +36,7 @@ typedef struct population
 
 typedef struct chromosome
 {
-    char *type;
+    chromosomeType type;
     unsigned int length;
 
     double *supLimit;

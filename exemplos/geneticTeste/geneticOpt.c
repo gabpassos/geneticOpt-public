@@ -22,7 +22,7 @@ typedef struct chromosome
 } chromosomeData;
 
 typedef struct binChrom
-{   
+{
     int *gene;
     double fit;
 } binChromosome;
@@ -182,18 +182,18 @@ static PyMethodDef realCodificationMethods[] =
 
 static PyMemberDef realCodificationMembers[] =
 {
-    {"popData", T_NONE, offsetof(realCodificationObject, popData), 0, 
+    {"popData", T_NONE, offsetof(realCodificationObject, popData), 0,
     "Population Settings"},
-    
+
     {"chromData", T_NONE, offsetof(realCodificationObject, chromData), 0,
     "Chromosome Settings"},
-    
+
     {"population", T_NONE, offsetof(realCodificationObject, population), 0,
     "Complete Population"},
-    
+
     {"crossModel", T_NONE, offsetof(realCodificationObject, popData), 0,
     "Crossover Settings"},
-    
+
     {"mutModel", T_NONE, offsetof(realCodificationObject, popData), 0,
     "Mutation Settings"},
 
@@ -279,7 +279,7 @@ void realCrossover1Pt(realChromosome *pai1, realChromosome *pai2, realChromosome
             (filho1->gene)[i] = (pai1->gene)[i];
             (filho2->gene)[i] = (pai2->gene)[i];
         }
-    }    
+    }
 }
 
 void realRandomMutation(realChromosome *ind, int chromosomeLength, double mutationProb)
@@ -323,7 +323,7 @@ realChromosome * torneio(realChromosome *ind1, realChromosome *ind2)
         }
     }
 
-    return ind2;    
+    return ind2;
 }
 
 void fitEval(realChromosome *ind)
@@ -390,7 +390,7 @@ static PyObject * realCodificationModelSolver(PyObject *self, PyObject *Py_UNUSE
     for(g = 0; g < genMod->popData.numGenerations; g++)
     {
         ordena(genMod->population, genMod->popData.popSize);
-        
+
         for(i = 0; i < genMod->popData.popSize/2; i++)
         {
             a = (int) uniform(0, (genMod->popData.popSize)-1);
@@ -409,7 +409,7 @@ static PyObject * realCodificationModelSolver(PyObject *self, PyObject *Py_UNUSE
             fitEval(&(mista[2*i]));
             fitEval(&(mista[2*i+1]));
         }
-        
+
         j = genMod->popData.popSize;
 
         for(i = 0; i < genMod->popData.popSize; i++)

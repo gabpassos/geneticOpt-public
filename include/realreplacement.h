@@ -3,12 +3,18 @@
 
 #include "stdgen.h"
 
+typedef enum realreplacementtype
+{
+    realRepl_type_undef = 0,
+    realElitist = 1
+} realReplacementType;
+
 typedef void realReplacementFunction(realChromosome *dest, realChromosome *src, populationData *population, realReplacementModel *replacement, chromosomeData *chromosome);
 typedef int realCompareFunction(const void *a, const void *b);
 
 typedef struct realreplacementmodel
 {
-    char *type;
+    realReplacementType type;
     realReplacementFunction *function;
     realCompareFunction *srcPopOrdFunction;
 } realReplacementModel;

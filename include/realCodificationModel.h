@@ -18,9 +18,9 @@ typedef struct realgeneticmodel
 {
     PyObject_HEAD
     PyObject *fitFunction;
-    objective obj;
+    objective objType;
 
-    realChromosome *indvidual;
+    realChromosome *individual;
 
     populationData population;
     chromosomeData chromosome;
@@ -36,6 +36,7 @@ typedef struct realgeneticmodel
 
 static PyObject * defaultNewRealGeneticModel(PyTypeObject *type, PyObject *args, PyObject *kwds);
 static int usrInitRealGeneticModel(realGeneticModelObject *self, PyObject *args, PyObject *kwds);
+static void realGeneticModelDealloc(realGeneticModelObject *self);
 static PyObject * realGeneticModelSolver(PyObject *self, PyObject *Py_UNUSED(ignored));
 
 #endif

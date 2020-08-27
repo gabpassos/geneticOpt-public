@@ -11,6 +11,7 @@ typedef enum realselecttype
 } realSelectType;
 
 typedef struct tournamentmodel tournamentModel;
+typedef struct realselectionmodel realSelectionModel;
 
 typedef realChromosome* tournamentFunction(tournamentModel *model, realChromosome *srcPopulation);
 typedef void realSelectionFunction(realChromosome ***parents, realChromosome *srcPopulation, populationData *population, realSelectionModel *model);

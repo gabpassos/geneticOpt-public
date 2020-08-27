@@ -14,6 +14,8 @@
 #include "realmutation.h"
 #include "realreplacement.h"
 
+static PyObject* geneticError;
+
 typedef struct realgeneticmodel
 {
     PyObject_HEAD

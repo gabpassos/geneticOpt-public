@@ -72,11 +72,11 @@ static PyTypeObject realGeneticModelType =
     .tp_members = realGeneticModelObjectMembers,
 };
 
-static PyModuleDef realGeneticModelModule =
+static PyModuleDef geneticOptModule =
 {
     PyModuleDef_HEAD_INIT,
     .m_name = "geneticOpt",
-    .m_doc = "Genetic Algorithms for real codification models.",
+    .m_doc = "Genetic Algorithms for Python.",
     .m_size = -1,
 };
 
@@ -101,7 +101,7 @@ static PyObject * defaultNewRealGeneticModel(PyTypeObject *type, PyObject *args,
         self->population.totalChildren = 0;
         self->population.maxIndividuals = 0;
 
-        self->chromosome.type = chrom_type_undef;
+        self->chromosome.type = real;
         self->chromosome.length = 0;
         self->chromosome.infLimit = NULL;
         self->chromosome.supLimit = NULL;
@@ -139,7 +139,47 @@ static PyObject * defaultNewRealGeneticModel(PyTypeObject *type, PyObject *args,
 
 static int usrInitRealGeneticModel(realGeneticModelObject *self, PyObject *args, PyObject *kwds)
 {
+    char *initTypeStr, *selectionTypeStr, *crossoverTypeStr, *mutationTypeStr, *replacementTypeStr;
 
+    static char *kwlist[] =
+    {
+        "maxGenerations", "size", "totalFamilies", "totalParents", "totalChildren",
+        "chromosomeLength",
+        "initType",
+        "selectionType",
+        "crossoverType", "crossoverProb",
+        "mutationType", "mutationProb", "alleleMutationProb",
+        "replacementType",
+        NULL
+    };
+
+    if(!PyArg_ParseTupleAndKeywords(args, kwds, "|IIIIIIsssdsdds", kwlist,
+    &(self->population.maxGenerations), &(self->population.size), &(self->population.totalFamilies), &(self->population.totalParents), &(self->population.totalChildren),
+    &(self->chromosome.length),
+    &initTypeStr,
+    &selectionTypeStr,
+    &crossoverTypeStr, &(self->crossover.prob),
+    &mutationTypeStr, &(self->mutation.prob), &(self->mutation.alleleMutProb),
+    &replacementTypeStr))
+    {
+        return -1;
+    }
+
+    //Set Population settings
+
+    //Set Chromosome settings
+
+    //Set Init Settings
+
+    //Set Selection Settings
+
+    //Set Crossover settings
+
+    //Set Mutation Settings
+
+    //Set replacement settings
+
+    return 0;
 }
 
 static void realGeneticModelDealloc(realGeneticModelObject *self)
@@ -150,4 +190,42 @@ static void realGeneticModelDealloc(realGeneticModelObject *self)
 static PyObject * realGeneticModelSolver(PyObject *self, PyObject *Py_UNUSED(ignored))
 {
 
+}
+
+PyMODINIT_FUNC PyInit_geneticOpt(void)
+{
+    PyObject *m;
+
+    //Verify if types are ready and well defined
+    if(PyType_Ready(&realGeneticModelType) < 0)
+    {
+        return NULL;
+    }
+
+    //Create module
+    m = PyModule_Create(&geneticOptModule);
+    if(m == NULL)
+    {
+        return NULL;
+    }
+
+    //Add the error object to the geneticOpt module
+    geneticError = PyErr_NewException("geneticOpt.geneticError", NULL, NULL);
+    Py_XINCREF(geneticError);
+    if(PyModule_AddObject(m, "geneticError", geneticError) < 0)
+    {
+        Py_XDECREF(geneticError);
+        Py_CLEAR(geneticError);
+        Py_DECREF(m);
+        return NULL;
+    }
+
+    //Add Objects
+    Py_INCREF(&realGeneticModelType);
+    if(PyModule_AddObject(m, "realCodificationModel", (PyObject *) &realGeneticModelType) < 0)
+    {
+        Py_DECREF(&realGeneticModelType);
+        Py_DECREF(m);
+        return NULL;
+    }
 }

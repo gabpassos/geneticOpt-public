@@ -6,8 +6,8 @@
 typedef enum realinittype
 {
     realInit_type_undef = 0,
-    realUniformRandom = 1,
-    user_set = 2
+    realUniformRandomInitType = 1,
+    userSetInitType = 2
 } realInitType;
 
 typedef void initializationFunction(realChromosome *dest, populationData *population, chromosomeData *chromosome);

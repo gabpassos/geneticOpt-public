@@ -6,8 +6,8 @@
 typedef enum realselecttype
 {
     realSelect_type_undef = 0,
-    realTwoParentsTournament = 1,
-    realnParentsTournament = 2
+    realTwoParentsTournamentSelectionType = 1,
+    realnParentsTournamentSelectionType = 2
 } realSelectType;
 
 typedef struct tournamentmodel tournamentModel;

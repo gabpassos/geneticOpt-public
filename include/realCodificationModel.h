@@ -41,4 +41,10 @@ static int usrInitRealGeneticModel(realGeneticModelObject *self, PyObject *args,
 static void realGeneticModelDealloc(realGeneticModelObject *self);
 static PyObject * realGeneticModelSolver(PyObject *self, PyObject *Py_UNUSED(ignored));
 
+static boolean populationModelVerifySettings(populationData *population);
+static boolean chromosomeModelVerifySettings(chromosomeData *chromosome);
+static boolean realInitializationModelVerifySettings(realInitializationModel *initialization, char *initTypeStr);
+
+PyMODINIT_FUNC PyInit_geneticOpt(void);
+
 #endif

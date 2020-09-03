@@ -1,6 +1,13 @@
 from setuptools import setup, Extension
 
-srcFiles = ["src/geneticOpt.c", "realcrossover.c", "realinitialization.c", "realmutation.c", "realreplacement.c", "realselection.c", "stdgen.c", "stdmath.c"]
+srcFiles = [
+    "src/geneticOpt.c",
+    "src/realcrossover.c",
+    "src/realinitialization.c",
+    "src/realmutation.c",
+    "src/realreplacement.c",
+    "src/realselection.c",
+    "src/stdgen.c", "src/stdmath.c"]
 
 includeDirs = ["include"]
 

@@ -4,7 +4,11 @@
 #include <Python.h>
 #include "structmember.h"
 
-#include "geneticOpt.h"
+//USED ONLY IN MODEL VERIFICATION - REMOVE IF VERIFICATION FUNCTIONS ARE MOVED TO A EXCLUSIVE SRC FILE
+#include <stdlib.h>
+#include <string.h>
+
+#include "realCodificationModel.h"
 #include "stdmath.h"
 #include "stdgen.h"
 #include "realinitialization.h"
@@ -139,11 +143,13 @@ static PyObject * defaultNewRealGeneticModel(PyTypeObject *type, PyObject *args,
 
 static int usrInitRealGeneticModel(realGeneticModelObject *self, PyObject *args, PyObject *kwds)
 {
-    char *initTypeStr, *selectionTypeStr, *crossoverTypeStr, *mutationTypeStr, *replacementTypeStr;
+    char *objStr, *initTypeStr, *selectionTypeStr, *crossoverTypeStr, *mutationTypeStr, *replacementTypeStr;
+    PyObject *fitFunction;
 
     static char *kwlist[] =
     {
-        "maxGenerations", "size", "totalFamilies", "totalParents", "totalChildren",
+        "objective", "fitFunction"
+        "maxGenerations", "populationSize", "totalFamilies", "totalParents", "totalChildren",
         "chromosomeLength",
         "initType",
         "selectionType",
@@ -152,6 +158,8 @@ static int usrInitRealGeneticModel(realGeneticModelObject *self, PyObject *args,
         "replacementType",
         NULL
     };
+
+
 
     if(!PyArg_ParseTupleAndKeywords(args, kwds, "|IIIIIIsssdsdds", kwlist,
     &(self->population.maxGenerations), &(self->population.size), &(self->population.totalFamilies), &(self->population.totalParents), &(self->population.totalChildren),
@@ -165,13 +173,35 @@ static int usrInitRealGeneticModel(realGeneticModelObject *self, PyObject *args,
         return -1;
     }
 
+    //Set Objective Settings
+    if(False)
+    {
+        return -1;
+    }//Fit function and objective type.
+
     //Set Population settings
+    if(!populationModelVerifySettings(&(self->population)))
+    {
+        return -1;
+    }
 
     //Set Chromosome settings
+    if(!chromosomeModelVerifySettings(&(self->chromosome)))
+    {
+        return -1;
+    }
 
     //Set Init Settings
+    if(!realInitializationModelVerifySettings(&(self->initialization), initTypeStr))
+    {
+        return -1;
+    }
 
     //Set Selection Settings
+    if(!realSelectionModelVerifySettings(&(self->selection), selectionTypeStr, &(self->population), self->objType))
+    {
+        return -1;
+    }
 
     //Set Crossover settings
 
@@ -190,6 +220,137 @@ static void realGeneticModelDealloc(realGeneticModelObject *self)
 static PyObject * realGeneticModelSolver(PyObject *self, PyObject *Py_UNUSED(ignored))
 {
 
+}
+
+static boolean populationModelVerifySettings(populationData *population)
+{
+    if(population->maxGenerations <= 0)
+    {
+        PyErr_SetString(geneticError, "maxGeneration must be an integer greater than zero.");
+        return False;
+    }
+
+    else if(population->size <= 0)
+    {
+        PyErr_SetString(geneticError, "populationSize must be an integer greater than zero.");
+        return False;
+    }
+
+    else if(population->totalFamilies <= 0)
+    {
+        PyErr_SetString(geneticError, "totalFamilies must be an integer greater than zero.");
+        return False;
+    }
+
+    else if(population->totalParents < 2)
+    {
+        PyErr_SetString(geneticError, "totalParents must be an integer greater than or equal to two.");
+        return False;
+    }
+
+    else if(population->totalChildren < 2)
+    {
+        PyErr_SetString(geneticError, "totalChildren must be an integer greater than or equal to two.");
+        return False;
+    }
+
+    population->maxIndividuals = population->size + (population->totalFamilies)*(population->totalChildren);
+
+    return True;
+}
+
+static boolean chromosomeModelVerifySettings(chromosomeData *chromosome)
+{
+    int i;
+
+    if(chromosome->length <= 0)
+    {
+        PyErr_SetString(geneticError, "chromosomeLength must be an integer greater than zero.");
+        return False;
+    }
+
+    chromosome->infLimit = (double *) malloc(chromosome->length*sizeof(double));
+    if(chromosome->infLimit == NULL)
+    {
+        PyErr_NoMemory();
+        return False;
+    }
+
+    chromosome->supLimit = (double *) malloc(chromosome->length*sizeof(double));
+    if(chromosome->supLimit == NULL)
+    {
+        PyErr_NoMemory();
+        return False;
+    }
+
+    for(i = 0; i < chromosome->length; i++)
+    {
+        chromosome->infLimit[i] = - DEFAULT_CHROM_LIMIT;
+        chromosome->supLimit[i] = DEFAULT_CHROM_LIMIT;
+    }
+
+    return True;
+}
+
+static boolean realInitializationModelVerifySettings(realInitializationModel *initialization, char *initTypeStr)
+{
+    if(strcmp(initTypeStr, "uniformRandom"))
+    {
+        initialization->type = realUniformRandomInitType;
+        initialization->function = realUniformRandomInit;
+    }
+
+    else
+    {
+        PyErr_SetString(geneticError, "The current initType provided isn't supported.");
+        return False;
+    }
+
+    return True;
+}
+
+static boolean realSelectionModelVerifySettings(realSelectionModel *selection, char *selectionTypeStr, populationData *population, objective obj)
+{
+    if(strcmp(selectionTypeStr, "tournament"))
+    {
+        if(population->totalParents == 2)
+        {
+            selection->type = realTwoParentsTournamentSelectionType;
+            selection->function = realTwoParentsTournamentSelection;
+        }
+
+        else
+        {
+            selection->type = realnParentsTournamentSelectionType;
+            selection->function = realnParentsTournamentSelection;
+        }
+
+        selection->tourModel.tourSize = 2;
+        selection->tourModel.tourGroup = (int *) malloc(2*sizeof(int));
+        if(selection->tourModel.tourGroup == NULL)
+        {
+            PyErr_NoMemory();
+            return False;
+        }
+
+        if(obj == min)
+        {
+            selection->tourModel.function = minTournament;
+        }
+
+        else
+        {
+            selection->tourModel.function = maxTournament;
+        }
+    }
+
+    else
+    {
+        PyErr_SetString(geneticError, "The current selectionType provided isn't supported.");
+        return False;
+    }
+
+    return True;
 }
 
 PyMODINIT_FUNC PyInit_geneticOpt(void)

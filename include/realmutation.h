@@ -3,11 +3,13 @@
 
 #include "stdgen.h"
 
+#define DEFAULT_UNIFORMMUT_LIMIT 0.1
+
 typedef enum realmutationtype
 {
     realMut_type_undef = 0,
-    realTotalUniformRandom = 1,
-    realUniformRandom = 2,
+    realTotalUniformRandomMutationType = 1,
+    realUniformRandomMutationType = 2,
 } realMutationType;
 
 typedef void realMutationFunction(realChromosome *ind, realMutationModel *mutation, chromosomeData *chromosome);

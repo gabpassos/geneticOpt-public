@@ -6,10 +6,10 @@
 typedef enum realcrosstype
 {
     realCross_type_undef = 0,
-    realOnePoint = 1,
-    realTwoPoint = 2,
-    realThreePoint = 3,
-    realnPoint = 4,
+    realOnePointCrossoverType = 1,
+    realTwoPointCrossoverType = 2,
+    realThreePointCrossoverType = 3,
+    realnPointCrossoverType = 4,
 } realCrossType;
 
 typedef void realCrossoverFunction(realChromosome ***parents, realChromosome *totalPopulation, realCrossoverModel *crossover, populationData *population, chromosomeData *chromosome, unsigned int generation);

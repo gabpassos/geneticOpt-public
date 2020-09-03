@@ -204,8 +204,16 @@ static int usrInitRealGeneticModel(realGeneticModelObject *self, PyObject *args,
     }
 
     //Set Crossover settings
+    if(!realCrossoverModelVerifySettings(&(self->crossover), &(self->chromosome), crossoverTypeStr))
+    {
+        return -1;
+    }
 
     //Set Mutation Settings
+    if(!realMutationModelVerifySettings(&(self->mutation), &(self->chromosome), mutationTypeStr))
+    {
+        return -1;
+    }
 
     //Set replacement settings
 
@@ -302,7 +310,7 @@ static boolean realInitializationModelVerifySettings(realInitializationModel *in
 
     else
     {
-        PyErr_SetString(geneticError, "The current initType provided isn't supported.");
+        PyErr_SetString(geneticError, "The initType provided cannot be recognized.");
         return False;
     }
 
@@ -346,7 +354,175 @@ static boolean realSelectionModelVerifySettings(realSelectionModel *selection, c
 
     else
     {
-        PyErr_SetString(geneticError, "The current selectionType provided isn't supported.");
+        PyErr_SetString(geneticError, "The selectionType provided cannot be recognized.");
+        return False;
+    }
+
+    return True;
+}
+
+static boolean realCrossoverModelVerifySettings(realCrossoverModel *crossover, chromosomeData *chromosome, char *crossoverTypeStr)
+{
+    int i;
+    double ratio;
+
+    if(crossover->prob < 0 || crossover->prob > 1)
+    {
+        PyErr_SetString(geneticError, "The crossoverProb must be a double in the [0,1] interval.");
+        return False;
+    }
+
+    if(strcmp(crossoverTypeStr, "1-Point"))
+    {
+        crossover->type = realOnePointCrossoverType;
+        crossover->function = realOnePointCrossover;
+        crossover->nPoint = 1;
+
+        if(!verifyChromLengthWithnPoint(chromosome->length, 1))
+        {
+            return False;
+        }
+    }
+
+    else if(strcmp(crossoverTypeStr, "2-Point"))
+    {
+        crossover->type = realTwoPointCrossoverType;
+        crossover->function = realTwoPointCrossover;
+        crossover->nPoint = 2;
+
+        if(!verifyChromLengthWithnPoint(chromosome->length, 2))
+        {
+            return False;
+        }
+    }
+
+    else if(strcmp(crossoverTypeStr, "3-Point"))
+    {
+        crossover->type = realThreePointCrossoverType;
+        crossover->function = realThreePointCrossover;
+        crossover->nPoint = 3;
+
+        if(!verifyChromLengthWithnPoint(chromosome->length, 3))
+        {
+            return False;
+        }
+    }
+
+    else if(strcmp(crossoverTypeStr, "n-Point"))
+    {
+        crossover->type = realnPointCrossoverType;
+        crossover->function = realnPointCrossover;
+        crossover->nPoint = 4;
+
+        if(!verifyChromLengthWithnPoint(chromosome->length, 4))
+        {
+            return False;
+        }
+    }
+
+    else
+    {
+        PyErr_SetString(geneticError, "The crossoverType provided cannot be recognized.");
+        return False;
+    }
+
+    crossover->sepLimits = (double **) malloc((crossover->nPoint)*sizeof(double *));
+    if(crossover->sepLimits == NULL)
+    {
+        PyErr_NoMemory();
+        return False;
+    }
+
+    ratio = (chromosome->length)/(crossover->nPoint);
+
+    for(i = 0; i < crossover->nPoint; i++)
+    {
+        crossover->sepLimits[i] = (double *) malloc(2*sizeof(double));
+
+        if(crossover->sepLimits[i] == NULL)
+        {
+            PyErr_NoMemory();
+            return False;
+        }
+
+        crossover->sepLimits[i][0] = (unsigned int) i*ratio;
+        crossover->sepLimits[i][1] = (unsigned int) (i + 1)*ratio;
+    }
+
+    return True;
+}
+
+static boolean realMutationModelVerifySettings(realMutationModel *mutation, chromosomeData *chromosome, char *mutationTypeStr)
+{
+    int i;
+
+    if(mutation->prob < 0 || mutation->prob > 1)
+    {
+        PyErr_SetString(geneticError, "The mutationProb must be a double in the [0,1] interval.");
+        return False;
+    }
+
+    if(mutation->alleleMutProb < 0 || mutation->alleleMutProb > 1)
+    {
+        PyErr_SetString(geneticError, "The alleleMutProb must be a double in the [0,1] interval.");
+        return False;
+    }
+
+    mutation->limit = (double **) malloc((chromosome->length)*sizeof(double *));
+    if(mutation->limit == NULL)
+    {
+        PyErr_NoMemory();
+        return False;
+    }
+
+    for(i = 0; i < chromosome->length; i++)
+    {
+        mutation->limit[i] = (double *) malloc(2*sizeof(double));
+        if(mutation->limit[i] == NULL)
+        {
+            PyErr_NoMemory();
+            return False;
+        }
+    }
+
+    if(strcmp(mutationTypeStr, "totalUniformRandom"))
+    {
+        mutation->type = realTotalUniformRandomMutationType;
+        mutation->function = realTotalUniformRandomMutation;
+
+        for(i = 0; i < chromosome->length; i++)
+        {
+            mutation->limit[i][0] = - DEFAULT_CHROM_LIMIT;
+            mutation->limit[i][1] = DEFAULT_CHROM_LIMIT;
+        }
+    }
+
+    else if(strcmp(mutationTypeStr, "uniformRandom"))
+    {
+        mutation->type = realUniformRandomMutationType;
+        mutation->function = realUniformRandomMutation;
+
+        for(i = 0; i < chromosome->length; i++)
+        {
+            mutation->limit[i][0] = - DEFAULT_UNIFORMMUT_LIMIT;
+            mutation->limit[i][1] = DEFAULT_UNIFORMMUT_LIMIT;
+        }
+    }
+
+    else
+    {
+        PyErr_SetString(geneticError, "The mutationType provided cannot be recognized.");
+        return False;
+    }
+
+    return True;
+}
+
+static boolean verifyChromLengthWithnPoint(unsigned int chromLength, unsigned int nPoint)
+{
+    if(nPoint >= chromLength)
+    {
+        PyErr_SetString(geneticError, "n-Point crossover must have n less than chromosomeLength.");
         return False;
     }
 

@@ -44,6 +44,10 @@ static PyObject * realGeneticModelSolver(PyObject *self, PyObject *Py_UNUSED(ign
 static boolean populationModelVerifySettings(populationData *population);
 static boolean chromosomeModelVerifySettings(chromosomeData *chromosome);
 static boolean realInitializationModelVerifySettings(realInitializationModel *initialization, char *initTypeStr);
+static boolean realCrossoverModelVerifySettings(realCrossoverModel *crossover, chromosomeData *chromosome, char *crossoverTypeStr);
+static boolean realMutationModelVerifySettings(realMutationModel *mutation, chromosomeData *chromosome, char *mutationTypeStr);
+
+static boolean verifyChromLengthWithnPoint(unsigned int chromLength, unsigned int nPoint);
 
 PyMODINIT_FUNC PyInit_geneticOpt(void);
 

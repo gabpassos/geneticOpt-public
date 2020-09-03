@@ -216,6 +216,10 @@ static int usrInitRealGeneticModel(realGeneticModelObject *self, PyObject *args,
     }
 
     //Set replacement settings
+    if(!realReplacementModelVerifySettings(&(self->replacement), replacementTypeStr, self->objType))
+    {
+        return -1;
+    }
 
     return 0;
 }
@@ -512,6 +516,33 @@ static boolean realMutationModelVerifySettings(realMutationModel *mutation, chro
     else
     {
         PyErr_SetString(geneticError, "The mutationType provided cannot be recognized.");
+        return False;
+    }
+
+    return True;
+}
+
+static boolean realReplacementModelVerifySettings(realReplacementModel *replacement, char *replacementTypeStr, objective obj)
+{
+    if(strcmp(replacementTypeStr, "elitist"))
+    {
+        replacement->type = realElitistReplacementType;
+        replacement->function = realElitistReplacement;
+
+        if(obj == min)
+        {
+            replacement->srcPopOrdFunction = realMinimizationCompare;
+        }
+
+        else
+        {
+            replacement->srcPopOrdFunction = realMaximizationCompare;
+        }
+    }
+
+    else
+    {
+        PyErr_SetString(geneticError, "The replacementType provided cannot be recognized.");
         return False;
     }
 

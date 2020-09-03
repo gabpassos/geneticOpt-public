@@ -6,7 +6,7 @@
 typedef enum realreplacementtype
 {
     realRepl_type_undef = 0,
-    realElitist = 1
+    realElitistReplacementType = 1
 } realReplacementType;
 
 typedef void realReplacementFunction(realChromosome *dest, realChromosome *src, populationData *population, realReplacementModel *replacement, chromosomeData *chromosome);

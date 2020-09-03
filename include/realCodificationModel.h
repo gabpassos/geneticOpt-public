@@ -46,6 +46,7 @@ static boolean chromosomeModelVerifySettings(chromosomeData *chromosome);
 static boolean realInitializationModelVerifySettings(realInitializationModel *initialization, char *initTypeStr);
 static boolean realCrossoverModelVerifySettings(realCrossoverModel *crossover, chromosomeData *chromosome, char *crossoverTypeStr);
 static boolean realMutationModelVerifySettings(realMutationModel *mutation, chromosomeData *chromosome, char *mutationTypeStr);
+static boolean realReplacementModelVerifySettings(realReplacementModel *replacement, char *replacementTypeStr, objective obj);
 
 static boolean verifyChromLengthWithnPoint(unsigned int chromLength, unsigned int nPoint);
 

@@ -143,8 +143,8 @@ static PyObject * defaultNewRealGeneticModel(PyTypeObject *type, PyObject *args,
 
 static int usrInitRealGeneticModel(realGeneticModelObject *self, PyObject *args, PyObject *kwds)
 {
-    char *objStr, *initTypeStr, *selectionTypeStr, *crossoverTypeStr, *mutationTypeStr, *replacementTypeStr;
-    PyObject *fitFunction;
+    char *objTypeStr, *initTypeStr, *selectionTypeStr, *crossoverTypeStr, *mutationTypeStr, *replacementTypeStr;
+    PyObject *fitFunction = NULL;
 
     static char *kwlist[] =
     {
@@ -161,7 +161,8 @@ static int usrInitRealGeneticModel(realGeneticModelObject *self, PyObject *args,
 
 
 
-    if(!PyArg_ParseTupleAndKeywords(args, kwds, "|IIIIIIsssdsdds", kwlist,
+    if(!PyArg_ParseTupleAndKeywords(args, kwds, "|sOIIIIIIsssdsdds", kwlist,
+    &objTypeStr, &fitFunction,
     &(self->population.maxGenerations), &(self->population.size), &(self->population.totalFamilies), &(self->population.totalParents), &(self->population.totalChildren),
     &(self->chromosome.length),
     &initTypeStr,
@@ -232,6 +233,37 @@ static void realGeneticModelDealloc(realGeneticModelObject *self)
 static PyObject * realGeneticModelSolver(PyObject *self, PyObject *Py_UNUSED(ignored))
 {
 
+}
+
+static boolean objectiveVerifySettings(realGeneticModelObject *self, char *objTypeStr, PyObject *fitFunction)
+{
+    if(strcmp(objTypeStr, "min"))
+    {
+        self->objType = min;
+    }
+
+    else if (strcmp(objTypeStr, "max"))
+    {
+        self->objType = max;
+    }
+
+    else
+    {
+        PyErr_SetString(geneticError, "The objective type provided cannot be recognized.");
+        return False;
+    }
+
+    if(!PyCallable_Check(fitFunction))
+    {
+        PyErr_SetString(geneticError, "fitFunction must be callable.");
+        return False;
+    }
+
+    Py_INCREF(fitFunction);
+    Py_XDECREF(self->fitFunction);
+    self->fitFunction = fitFunction;
+
+    return True;
 }
 
 static boolean populationModelVerifySettings(populationData *population)

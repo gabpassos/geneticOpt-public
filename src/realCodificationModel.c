@@ -94,7 +94,7 @@ static PyObject * defaultNewRealGeneticModel(PyTypeObject *type, PyObject *args,
     {
         self->fitFunction = NULL;
 
-        self->objType = undef;
+        self->objType = obj_type_undef;
 
         self->individual = NULL;
 
@@ -159,8 +159,6 @@ static int usrInitRealGeneticModel(realGeneticModelObject *self, PyObject *args,
         NULL
     };
 
-
-
     if(!PyArg_ParseTupleAndKeywords(args, kwds, "|sOIIIIIIsssdsdds", kwlist,
     &objTypeStr, &fitFunction,
     &(self->population.maxGenerations), &(self->population.size), &(self->population.totalFamilies), &(self->population.totalParents), &(self->population.totalChildren),
@@ -175,10 +173,10 @@ static int usrInitRealGeneticModel(realGeneticModelObject *self, PyObject *args,
     }
 
     //Set Objective Settings
-    if(False)
+    if(!objectiveVerifySettings(self, objTypeStr, fitFunction))
     {
         return -1;
-    }//Fit function and objective type.
+    }
 
     //Set Population settings
     if(!populationModelVerifySettings(&(self->population)))
@@ -227,7 +225,43 @@ static int usrInitRealGeneticModel(realGeneticModelObject *self, PyObject *args,
 
 static void realGeneticModelDealloc(realGeneticModelObject *self)
 {
+    int i;
 
+    Py_XDECREF(self->fitFunction);
+
+    if(self->individual != NULL)
+    {
+        for(i = 0; i < self->population.size; i++)
+        {
+            free(self->individual[i].gene);
+        }
+        free(self->individual);
+    }
+
+    free(self->chromosome.infLimit);
+    free(self->chromosome.supLimit);
+
+    free(self->selection.tourModel.tourGroup);
+
+    if(self->crossover.sepLimits != NULL)
+    {
+        for(i = 0; i < self->crossover.nPoint; i++)
+        {
+            free(self->crossover.sepLimits[i]);
+        }
+        free(self->crossover.sepLimits);
+    }
+
+    if(self->mutation.limit != NULL)
+    {
+        for(i = 0; i < self->chromosome.length; i++)
+        {
+            free(self->mutation.limit[i]);
+        }
+        free(self->mutation.limit);
+    }
+
+    Py_TYPE(self)->tp_free((PyObject *) self);
 }
 
 static PyObject * realGeneticModelSolver(PyObject *self, PyObject *Py_UNUSED(ignored))

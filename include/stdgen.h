@@ -9,7 +9,7 @@
 
 typedef enum obj
 {
-    undef = 0,
+    obj_type_undef = 0,
     min = 1,
     max = 2
 } objective;

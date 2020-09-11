@@ -3,6 +3,8 @@
 
 #include "stdgen.h"
 
+typedef struct realreplacementmodel realReplacementModel;
+
 typedef enum realreplacementtype
 {
     realRepl_type_undef = 0,

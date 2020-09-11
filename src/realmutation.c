@@ -2,39 +2,41 @@
 #include "realmutation.h"
 #include "stdgen.h"
 
-void realTotalUniformRandomMutation(realChromosome *ind, realMutationModel *mutation, chromosomeData *chromosome)
+void realTotalUniformRandomMutation(realChromosome *totalPopulation, populationData *population, realMutationModel *mutation, chromosomeData *chromosome)
 {
-    int i;
+    int i, j;
     double prob;
 
-    prob = uniform(0, 1);
-    if(prob < mutation->prob)
+    for(i = 0; i < population->totalChildren; i++)
     {
-        ind->evaluated = False;
-
-        for(i = 0; i < chromosome->length; i++)
+        prob = uniform(0, 1);
+        if(prob < mutation->prob)
         {
-            ind->gene[i] = uniform(mutation->limit[i][0], mutation->limit[i][1]);
+            for(j = 0; j < chromosome->length; j++)
+            {
+                totalPopulation[i].gene[j] = uniform(mutation->limit[j][0], mutation->limit[j][1]);
+            }
         }
     }
 }
 
-void realUniformRandomMutation(realChromosome *ind, realMutationModel *mutation, chromosomeData *chromosome)
+void realUniformRandomMutation(realChromosome *totalPopulation, populationData *population, realMutationModel *mutation, chromosomeData *chromosome)
 {
-    int i;
+    int i, j;
     double prob;
 
-    prob = uniform(0, 1);
-    if(prob < mutation->prob)
+    for(i = 0; i < population->totalChildren; i++)
     {
-        ind->evaluated = False;
-
-        for(i = 0; i < chromosome->length; i++)
+        prob = uniform(0, 1);
+        if(prob < mutation->prob)
         {
-            prob = uniform(0, 1);
-            if(prob < mutation->alleleMutProb)
+            for(j = 0; j < chromosome->length; j++)
             {
-                ind->gene[i] = ind->gene[i] + uniform(mutation->limit[i][0], mutation->limit[i][1]);
+                prob = uniform(0, 1);
+                if(prob < mutation->alleleMutProb)
+                {
+                    totalPopulation[i].gene[j] = totalPopulation[i].gene[j] + uniform(mutation->limit[j][0], mutation->limit[j][1]);
+                }
             }
         }
     }

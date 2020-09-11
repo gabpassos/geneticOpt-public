@@ -16,7 +16,7 @@ void realOnePointCrossover(realChromosome ***parents, realChromosome *totalPopul
             totalPopulation[k1].generation = generation;
 
             totalPopulation[k2].evaluated = False;
-            totalPopulation[k2].generation = generation;            
+            totalPopulation[k2].generation = generation;
 
             sep = (int) uniform(crossover->sepLimits[0][0], crossover->sepLimits[0][1]);
             for(j = 0; j < sep; j++)
@@ -35,7 +35,7 @@ void realOnePointCrossover(realChromosome ***parents, realChromosome *totalPopul
         else
         {
             copyRealChromosome(&totalPopulation[k1], parents[i][0], chromosome);
-            copyRealChromosome(&totalPopulation[k2], parents[i][1], chromosome);        
+            copyRealChromosome(&totalPopulation[k2], parents[i][1], chromosome);
         }
     }
 }
@@ -128,7 +128,7 @@ void realThreePointCrossover(realChromosome ***parents, realChromosome *totalPop
             {
                 totalPopulation[k1].gene[j] = parents[i][1]->gene[j];
                 totalPopulation[k2].gene[j] = parents[i][0]->gene[j];
-            }            
+            }
         }
 
         else
@@ -178,7 +178,7 @@ void realnPointCrossover(realChromosome ***parents, realChromosome *totalPopulat
                 {
                     totalPopulation[k1].gene[j] = parents[i][prtSrc1]->gene[j];
                     totalPopulation[k2].gene[j] = parents[i][prtSrc2]->gene[j];
-                }                
+                }
             }
 
             prtSrcAux = prtSrc1;

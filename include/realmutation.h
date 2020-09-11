@@ -5,6 +5,8 @@
 
 #define DEFAULT_UNIFORMMUT_LIMIT 0.1
 
+typedef struct realmutationmodel realMutationModel;
+
 typedef enum realmutationtype
 {
     realMut_type_undef = 0,
@@ -12,18 +14,18 @@ typedef enum realmutationtype
     realUniformRandomMutationType = 2,
 } realMutationType;
 
-typedef void realMutationFunction(realChromosome *ind, realMutationModel *mutation, chromosomeData *chromosome);
+typedef void realMutationFunction(realChromosome *totalPopulation, populationData *population, realMutationModel *mutation, chromosomeData *chromosome);
 
 typedef struct realmutationmodel
 {
-    char *type;
+    realMutationType type;
     realMutationFunction *function;
     double prob;
     double alleleMutProb;
     double **limit;
 } realMutationModel;
 
-void realTotalUniformRandomMutation(realChromosome *ind, realMutationModel *mutation, chromosomeData *chromosome);
-void realUniformRandomMutation(realChromosome *ind, realMutationModel *mutation, chromosomeData *chromosome);
+void realTotalUniformRandomMutation(realChromosome *totalPopulation, populationData *population, realMutationModel *mutation, chromosomeData *chromosome);
+void realUniformRandomMutation(realChromosome *totalPopulation, populationData *population, realMutationModel *mutation, chromosomeData *chromosome);
 
 #endif

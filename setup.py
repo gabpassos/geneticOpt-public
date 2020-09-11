@@ -1,7 +1,7 @@
 from setuptools import setup, Extension
 
 srcFiles = [
-    "src/geneticOpt.c",
+    "src/realCodificationModel.c",
     "src/realcrossover.c",
     "src/realinitialization.c",
     "src/realmutation.c",

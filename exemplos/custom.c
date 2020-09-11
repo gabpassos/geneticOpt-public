@@ -76,6 +76,24 @@ static PyMemberDef Custom_members[] = {
 static PyObject *
 Custom_name(CustomObject *self, PyObject *Py_UNUSED(ignored))
 {
+    PyObject *tuple;
+    PyObject *argTuple;
+    PyObject *build;
+
+    tuple = PyTuple_New(3);
+    argTuple = PyTuple_New(1);
+
+    PyTuple_SetItem(tuple, 0, PyFloat_FromDouble(0)); PyTuple_SetItem(tuple, 1, PyFloat_FromDouble(0)); PyTuple_SetItem(tuple, 2, PyFloat_FromDouble(0));
+    PyTuple_SetItem(argTuple, 0, tuple);
+    PyObject_Print(argTuple, stdout, 0);
+
+    PyTuple_SetItem(tuple, 0, PyFloat_FromDouble(1)); PyTuple_SetItem(tuple, 1, PyFloat_FromDouble(2)); PyTuple_SetItem(tuple, 2, PyFloat_FromDouble(3));
+    PyObject_Print(argTuple, stdout, 0);
+
+    build = Py_BuildValue("(i)", 123);
+    PyObject_Print(build, stdout, 0);
+
+
     if (self->first == NULL) {
         PyErr_SetString(PyExc_AttributeError, "first");
         return NULL;
@@ -91,9 +109,7 @@ static PyMethodDef Custom_methods[] = {
     {"name", (PyCFunction) Custom_name, METH_NOARGS,
      "Return the name, combining the first and last name"
     },
-    {"alterar", (PyCFunction) Custom_init, METH_VARARGS|METH_KEYWORDS,
-     "Return the name, combining the first and last name"
-    },
+
     {NULL}  /* Sentinel */
 };
 

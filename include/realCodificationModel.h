@@ -39,12 +39,13 @@ typedef struct realgeneticmodel
 static PyObject * defaultNewRealGeneticModel(PyTypeObject *type, PyObject *args, PyObject *kwds);
 static int usrInitRealGeneticModel(realGeneticModelObject *self, PyObject *args, PyObject *kwds);
 static void realGeneticModelDealloc(realGeneticModelObject *self);
-static PyObject * realGeneticModelSolver(PyObject *self, PyObject *Py_UNUSED(ignored));
+static PyObject * realGeneticModelSolver(realGeneticModelObject *self, PyObject *Py_UNUSED(ignored));
 
 static boolean objectiveVerifySettings(realGeneticModelObject *self, char *objTypeStr, PyObject *fitFunction);
 static boolean populationModelVerifySettings(populationData *population);
 static boolean chromosomeModelVerifySettings(chromosomeData *chromosome);
 static boolean realInitializationModelVerifySettings(realInitializationModel *initialization, char *initTypeStr);
+static boolean realSelectionModelVerifySettings(realSelectionModel *selection, char *selectionTypeStr, populationData *population, objective obj);
 static boolean realCrossoverModelVerifySettings(realCrossoverModel *crossover, chromosomeData *chromosome, char *crossoverTypeStr);
 static boolean realMutationModelVerifySettings(realMutationModel *mutation, chromosomeData *chromosome, char *mutationTypeStr);
 static boolean realReplacementModelVerifySettings(realReplacementModel *replacement, char *replacementTypeStr, objective obj);

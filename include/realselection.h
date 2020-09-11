@@ -16,19 +16,19 @@ typedef struct realselectionmodel realSelectionModel;
 typedef realChromosome* tournamentFunction(tournamentModel *model, realChromosome *srcPopulation);
 typedef void realSelectionFunction(realChromosome ***parents, realChromosome *srcPopulation, populationData *population, realSelectionModel *model);
 
-typedef struct realselectionmodel
-{
-    realSelectType type;
-    realSelectionFunction *function;
-    tournamentModel tourModel;
-} realSelectionModel;
-
 typedef struct tournamentmodel
 {
     int tourSize;
     int *tourGroup;
     tournamentFunction *function;
 } tournamentModel;
+
+typedef struct realselectionmodel
+{
+    realSelectType type;
+    realSelectionFunction *function;
+    tournamentModel tourModel;
+} realSelectionModel;
 
 realChromosome* minTournament(tournamentModel *model, realChromosome *srcPopulation);
 realChromosome* maxTournament(tournamentModel *model, realChromosome *srcPopulation);

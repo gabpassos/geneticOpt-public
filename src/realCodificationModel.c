@@ -19,7 +19,8 @@
 
 static PyMethodDef realGeneticModelMethods[] =
 {
-
+    {"Solve", (PyCFunction) realGeneticModelSolver, METH_NOARGS,
+    "Solves the genetic model."},
     {NULL, NULL, 0, NULL},
 };
 
@@ -102,6 +103,7 @@ static PyObject * defaultNewRealGeneticModel(PyTypeObject *type, PyObject *args,
         self->population.size = 0;
         self->population.totalFamilies = 0;
         self->population.totalParents = 0;
+        self->population.childrensPerFamily = 0;
         self->population.totalChildren = 0;
         self->population.maxIndividuals = 0;
 
@@ -148,8 +150,8 @@ static int usrInitRealGeneticModel(realGeneticModelObject *self, PyObject *args,
 
     static char *kwlist[] =
     {
-        "objective", "fitFunction"
-        "maxGenerations", "populationSize", "totalFamilies", "totalParents", "totalChildren",
+        "objective", "fitFunction",
+        "maxGenerations", "populationSize", "totalFamilies", "totalParents", "childrensPerFamily",
         "chromosomeLength",
         "initType",
         "selectionType",
@@ -161,7 +163,7 @@ static int usrInitRealGeneticModel(realGeneticModelObject *self, PyObject *args,
 
     if(!PyArg_ParseTupleAndKeywords(args, kwds, "|sOIIIIIIsssdsdds", kwlist,
     &objTypeStr, &fitFunction,
-    &(self->population.maxGenerations), &(self->population.size), &(self->population.totalFamilies), &(self->population.totalParents), &(self->population.totalChildren),
+    &(self->population.maxGenerations), &(self->population.size), &(self->population.totalFamilies), &(self->population.totalParents), &(self->population.childrensPerFamily),
     &(self->chromosome.length),
     &initTypeStr,
     &selectionTypeStr,
@@ -264,19 +266,170 @@ static void realGeneticModelDealloc(realGeneticModelObject *self)
     Py_TYPE(self)->tp_free((PyObject *) self);
 }
 
-static PyObject * realGeneticModelSolver(PyObject *self, PyObject *Py_UNUSED(ignored))
+static PyObject * realGeneticModelSolver(realGeneticModelObject *self, PyObject *Py_UNUSED(ignored))
 {
+    double soma;
 
+    int i, j, g;
+    realChromosome ***parents;
+    realChromosome totalPopulation[self->population.maxIndividuals];
+
+    PyObject *chromosome = NULL;
+    PyObject *fitArg = NULL;
+    PyObject *fitValue = NULL;
+
+    //Memory allocation to totalPopulation gene
+    for(i = 0; i < self->population.maxIndividuals; i++)
+    {
+        totalPopulation[i].gene = (double *) malloc(self->chromosome.length*sizeof(double));
+        if(totalPopulation[i].gene == NULL)
+        {
+            PyErr_NoMemory();
+            return NULL;
+        }
+    }
+
+    //Memory allocation to the population individuals
+    self->individual = (realChromosome *) malloc(self->population.size*sizeof(realChromosome));
+    if(self->individual == NULL)
+    {
+        PyErr_NoMemory();
+        return NULL;
+    }
+
+    for(i = 0; i < self->population.size; i++)
+    {
+        self->individual[i].gene = (double *) malloc(self->chromosome.length*sizeof(double));
+        if(self->individual[i].gene == NULL)
+        {
+            PyErr_NoMemory();
+            return NULL;
+        }
+    }
+
+    parents = (realChromosome ***) malloc((self->population.totalFamilies)*sizeof(realChromosome **));
+    if(parents == NULL)
+    {
+        PyErr_NoMemory();
+        return NULL;
+    }
+    for(i = 0; i < self->population.totalFamilies; i++)
+    {
+        parents[i] = (realChromosome **) malloc((self->population.totalParents)*sizeof(realChromosome *));
+        if(parents == NULL)
+        {
+            PyErr_NoMemory();
+            return NULL;
+        }
+    }
+
+    //Initialization of the Python tuple args for fitFunction
+    chromosome = PyTuple_New(self->chromosome.length);
+    if(chromosome == NULL)
+    {
+        return NULL;
+    }
+
+    fitArg = PyTuple_New(1);
+    if(fitArg == NULL)
+    {
+        Py_DECREF(chromosome);
+        return NULL;
+    }
+
+    PyTuple_SetItem(fitArg, 0, chromosome);
+
+    srand(time(NULL));
+
+    //Initialization
+    self->initialization.function(self->individual, &(self->population), &(self->chromosome));
+
+    //Evaluate population
+    for(i = 0; i < self->population.size; i++)
+    {
+        for(j = 0; j < self->chromosome.length; j++)
+        {
+            PyTuple_SetItem(chromosome, j, PyFloat_FromDouble(self->individual[i].gene[j]));
+        }
+
+        fitValue = PyObject_CallObject(self->fitFunction, fitArg);
+        if(fitValue == NULL)
+        {
+            Py_DECREF(chromosome);
+            Py_DECREF(fitArg);
+            return NULL;
+        }
+
+        self->individual[i].fit = PyFloat_AsDouble(fitValue);
+        self->individual[i].evaluated = True;
+
+        Py_DECREF(fitValue);
+
+        soma = 0;
+        for(j = 0; j < self->chromosome.length; j++)
+        {
+            soma += self->individual[i].gene[j]*self->individual[i].gene[j];
+        }
+        self->individual[i].fit = soma;
+        self->individual[i].evaluated = True;
+    }
+
+    for(g = 1; g <= self->population.maxGenerations; g++)
+    {
+        //Selection
+        self->selection.function(parents, self->individual, &(self->population), &(self->selection));
+
+        //Crossover
+        self->crossover.function(parents, totalPopulation, &(self->crossover), &(self->population), &(self->chromosome), g);
+
+        //Mutation
+        self->mutation.function(totalPopulation, &(self->population), &(self->mutation), &(self->chromosome));
+
+        //Evaluate offsprings
+        for(i = 0; i < self->population.totalChildren; i++)
+        {
+            for(j = 0; j < self->chromosome.length; j++)
+            {
+                PyTuple_SetItem(chromosome, j, PyFloat_FromDouble(totalPopulation[i].gene[j]));
+            }
+
+            fitValue = PyObject_CallObject(self->fitFunction, fitArg);
+            if(fitValue == NULL)
+            {
+                Py_DECREF(chromosome);
+                Py_DECREF(fitValue);
+                return NULL;
+            }
+
+            totalPopulation[i].fit = PyFloat_AsDouble(fitValue);
+            totalPopulation[i].evaluated = True;
+
+            Py_DECREF(fitValue);
+        }
+
+        //Complete totalPopulation with original individuals
+        for(i = self->population.totalChildren, j = 0; i < self->population.maxIndividuals; i++, j++)
+        {
+            copyRealChromosome(&totalPopulation[i], &(self->individual)[j], &(self->chromosome));
+        }
+
+        //Replacement
+        self->replacement.function(self->individual, totalPopulation, &(self->population), &(self->replacement), &(self->chromosome));
+    }
+
+    //Retornar NULL em principio;
+    Py_INCREF(Py_None);
+    return Py_None;
 }
 
 static boolean objectiveVerifySettings(realGeneticModelObject *self, char *objTypeStr, PyObject *fitFunction)
 {
-    if(strcmp(objTypeStr, "min"))
+    if(strcmp(objTypeStr, "min") == 0)
     {
         self->objType = min;
     }
 
-    else if (strcmp(objTypeStr, "max"))
+    else if (strcmp(objTypeStr, "max") == 0)
     {
         self->objType = max;
     }
@@ -326,13 +479,14 @@ static boolean populationModelVerifySettings(populationData *population)
         return False;
     }
 
-    else if(population->totalChildren < 2)
+    else if(population->childrensPerFamily < 2)
     {
-        PyErr_SetString(geneticError, "totalChildren must be an integer greater than or equal to two.");
+        PyErr_SetString(geneticError, "childrensPerFamily must be an integer greater than or equal to two.");
         return False;
     }
 
-    population->maxIndividuals = population->size + (population->totalFamilies)*(population->totalChildren);
+    population->maxIndividuals = population->size + (population->totalFamilies)*(population->childrensPerFamily);
+    population->totalChildren = (population->totalFamilies)*(population->childrensPerFamily);
 
     return True;
 }
@@ -372,7 +526,7 @@ static boolean chromosomeModelVerifySettings(chromosomeData *chromosome)
 
 static boolean realInitializationModelVerifySettings(realInitializationModel *initialization, char *initTypeStr)
 {
-    if(strcmp(initTypeStr, "uniformRandom"))
+    if(strcmp(initTypeStr, "uniformRandom") == 0)
     {
         initialization->type = realUniformRandomInitType;
         initialization->function = realUniformRandomInit;
@@ -389,7 +543,7 @@ static boolean realInitializationModelVerifySettings(realInitializationModel *in
 
 static boolean realSelectionModelVerifySettings(realSelectionModel *selection, char *selectionTypeStr, populationData *population, objective obj)
 {
-    if(strcmp(selectionTypeStr, "tournament"))
+    if(strcmp(selectionTypeStr, "tournament") == 0)
     {
         if(population->totalParents == 2)
         {
@@ -442,7 +596,7 @@ static boolean realCrossoverModelVerifySettings(realCrossoverModel *crossover, c
         return False;
     }
 
-    if(strcmp(crossoverTypeStr, "1-Point"))
+    if(strcmp(crossoverTypeStr, "1-Point") == 0)
     {
         crossover->type = realOnePointCrossoverType;
         crossover->function = realOnePointCrossover;
@@ -454,7 +608,7 @@ static boolean realCrossoverModelVerifySettings(realCrossoverModel *crossover, c
         }
     }
 
-    else if(strcmp(crossoverTypeStr, "2-Point"))
+    else if(strcmp(crossoverTypeStr, "2-Point") == 0)
     {
         crossover->type = realTwoPointCrossoverType;
         crossover->function = realTwoPointCrossover;
@@ -466,7 +620,7 @@ static boolean realCrossoverModelVerifySettings(realCrossoverModel *crossover, c
         }
     }
 
-    else if(strcmp(crossoverTypeStr, "3-Point"))
+    else if(strcmp(crossoverTypeStr, "3-Point") == 0)
     {
         crossover->type = realThreePointCrossoverType;
         crossover->function = realThreePointCrossover;
@@ -478,7 +632,7 @@ static boolean realCrossoverModelVerifySettings(realCrossoverModel *crossover, c
         }
     }
 
-    else if(strcmp(crossoverTypeStr, "n-Point"))
+    else if(strcmp(crossoverTypeStr, "n-Point") == 0)
     {
         crossover->type = realnPointCrossoverType;
         crossover->function = realnPointCrossover;
@@ -496,7 +650,7 @@ static boolean realCrossoverModelVerifySettings(realCrossoverModel *crossover, c
         return False;
     }
 
-    crossover->sepLimits = (double **) malloc((crossover->nPoint)*sizeof(double *));
+    crossover->sepLimits = (int **) malloc((crossover->nPoint)*sizeof(int *));
     if(crossover->sepLimits == NULL)
     {
         PyErr_NoMemory();
@@ -507,7 +661,7 @@ static boolean realCrossoverModelVerifySettings(realCrossoverModel *crossover, c
 
     for(i = 0; i < crossover->nPoint; i++)
     {
-        crossover->sepLimits[i] = (double *) malloc(2*sizeof(double));
+        crossover->sepLimits[i] = (int *) malloc(2*sizeof(int));
 
         if(crossover->sepLimits[i] == NULL)
         {
@@ -555,7 +709,7 @@ static boolean realMutationModelVerifySettings(realMutationModel *mutation, chro
         }
     }
 
-    if(strcmp(mutationTypeStr, "totalUniformRandom"))
+    if(strcmp(mutationTypeStr, "totalUniformRandom") == 0)
     {
         mutation->type = realTotalUniformRandomMutationType;
         mutation->function = realTotalUniformRandomMutation;
@@ -567,7 +721,7 @@ static boolean realMutationModelVerifySettings(realMutationModel *mutation, chro
         }
     }
 
-    else if(strcmp(mutationTypeStr, "uniformRandom"))
+    else if(strcmp(mutationTypeStr, "uniformRandom") == 0)
     {
         mutation->type = realUniformRandomMutationType;
         mutation->function = realUniformRandomMutation;
@@ -590,7 +744,7 @@ static boolean realMutationModelVerifySettings(realMutationModel *mutation, chro
 
 static boolean realReplacementModelVerifySettings(realReplacementModel *replacement, char *replacementTypeStr, objective obj)
 {
-    if(strcmp(replacementTypeStr, "elitist"))
+    if(strcmp(replacementTypeStr, "elitist") == 0)
     {
         replacement->type = realElitistReplacementType;
         replacement->function = realElitistReplacement;
@@ -662,4 +816,6 @@ PyMODINIT_FUNC PyInit_geneticOpt(void)
         Py_DECREF(m);
         return NULL;
     }
+
+    return m;
 }

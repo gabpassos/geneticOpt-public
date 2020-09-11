@@ -18,13 +18,13 @@ int realMinimizationCompare(const void *a, const void *b)
     realChromosome *ind1, *ind2;
 
     ind1 = (realChromosome *) a;
-    ind1 = (realChromosome *) a;
+    ind2 = (realChromosome *) b;
 
     if(ind1->fit < ind2->fit)
     {
         return -1;
     }
-    
+
     else if(ind1->fit > ind2->fit)
     {
         return 1;
@@ -38,13 +38,13 @@ int realMaximizationCompare(const void *a, const void *b)
     realChromosome *ind1, *ind2;
 
     ind1 = (realChromosome *) a;
-    ind1 = (realChromosome *) a;
+    ind2 = (realChromosome *) b;
 
     if(ind1->fit > ind2->fit)
     {
         return -1;
     }
-    
+
     else if(ind1->fit < ind2->fit)
     {
         return 1;

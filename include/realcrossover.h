@@ -3,6 +3,8 @@
 
 #include "stdgen.h"
 
+typedef struct realcrossovermodel realCrossoverModel;
+
 typedef enum realcrosstype
 {
     realCross_type_undef = 0,
@@ -19,8 +21,8 @@ typedef struct realcrossovermodel
     realCrossType type;
     realCrossoverFunction *function;
     double prob;
-    unsigned int nPoint;
-    unsigned int **sepLimits;
+    int nPoint;
+    int **sepLimits;
 } realCrossoverModel;
 
 void realOnePointCrossover(realChromosome ***parents, realChromosome *totalPopulation, realCrossoverModel *crossover, populationData *population, chromosomeData *chromosome, unsigned int generation);

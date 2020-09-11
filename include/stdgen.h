@@ -24,20 +24,21 @@ typedef enum chrom_type
 
 typedef struct population
 {
-    unsigned int size;
-    unsigned int maxGenerations;
+    int size;
+    int maxGenerations;
 
-    unsigned int totalFamilies;
-    unsigned int totalParents;
-    unsigned int totalChildren;
+    int totalFamilies;
+    int totalParents;
+    int childrensPerFamily;
+    int totalChildren;
 
-    unsigned int maxIndividuals;
+    int maxIndividuals;
 } populationData;
 
 typedef struct chromosome
 {
     chromosomeType type;
-    unsigned int length;
+    int length;
 
     double *supLimit;
     double *infLimit;
@@ -53,7 +54,7 @@ typedef struct realchromosome
     double fit;
     double *gene;
 
-    unsigned int generation;
+    int generation;
 
     boolean evaluated;
 } realChromosome;

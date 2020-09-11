@@ -50,6 +50,9 @@ static boolean realCrossoverModelVerifySettings(realCrossoverModel *crossover, c
 static boolean realMutationModelVerifySettings(realMutationModel *mutation, chromosomeData *chromosome, char *mutationTypeStr);
 static boolean realReplacementModelVerifySettings(realReplacementModel *replacement, char *replacementTypeStr, objective obj);
 
+static boolean realMemoryAllocSolver(realGeneticModelObject *self, realChromosome *totalPopulation, realChromosome ****parents, PyObject **chromosome, PyObject **fitArg);
+static boolean realMemoryAllocIndividuals(realGeneticModelObject *self);
+
 static boolean verifyChromLengthWithnPoint(unsigned int chromLength, unsigned int nPoint);
 
 PyMODINIT_FUNC PyInit_geneticOpt(void);

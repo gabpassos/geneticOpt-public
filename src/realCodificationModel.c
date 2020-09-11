@@ -222,6 +222,11 @@ static int usrInitRealGeneticModel(realGeneticModelObject *self, PyObject *args,
         return -1;
     }
 
+    if(!realMemoryAllocIndividuals(self))
+    {
+        return -1;
+    }
+
     return 0;
 }
 
@@ -268,8 +273,6 @@ static void realGeneticModelDealloc(realGeneticModelObject *self)
 
 static PyObject * realGeneticModelSolver(realGeneticModelObject *self, PyObject *Py_UNUSED(ignored))
 {
-    double soma;
-
     int i, j, g;
     realChromosome ***parents;
     realChromosome totalPopulation[self->population.maxIndividuals];
@@ -278,66 +281,10 @@ static PyObject * realGeneticModelSolver(realGeneticModelObject *self, PyObject 
     PyObject *fitArg = NULL;
     PyObject *fitValue = NULL;
 
-    //Memory allocation to totalPopulation gene
-    for(i = 0; i < self->population.maxIndividuals; i++)
-    {
-        totalPopulation[i].gene = (double *) malloc(self->chromosome.length*sizeof(double));
-        if(totalPopulation[i].gene == NULL)
-        {
-            PyErr_NoMemory();
-            return NULL;
-        }
-    }
-
-    //Memory allocation to the population individuals
-    self->individual = (realChromosome *) malloc(self->population.size*sizeof(realChromosome));
-    if(self->individual == NULL)
-    {
-        PyErr_NoMemory();
-        return NULL;
-    }
-
-    for(i = 0; i < self->population.size; i++)
-    {
-        self->individual[i].gene = (double *) malloc(self->chromosome.length*sizeof(double));
-        if(self->individual[i].gene == NULL)
-        {
-            PyErr_NoMemory();
-            return NULL;
-        }
-    }
-
-    parents = (realChromosome ***) malloc((self->population.totalFamilies)*sizeof(realChromosome **));
-    if(parents == NULL)
-    {
-        PyErr_NoMemory();
-        return NULL;
-    }
-    for(i = 0; i < self->population.totalFamilies; i++)
-    {
-        parents[i] = (realChromosome **) malloc((self->population.totalParents)*sizeof(realChromosome *));
-        if(parents == NULL)
-        {
-            PyErr_NoMemory();
-            return NULL;
-        }
-    }
-
-    //Initialization of the Python tuple args for fitFunction
-    chromosome = PyTuple_New(self->chromosome.length);
-    if(chromosome == NULL)
+    if(!realMemoryAllocSolver(self, totalPopulation, &parents, &chromosome, &fitArg))
     {
         return NULL;
     }
-
-    fitArg = PyTuple_New(1);
-    if(fitArg == NULL)
-    {
-        Py_DECREF(chromosome);
-        return NULL;
-    }
-
-    PyTuple_SetItem(fitArg, 0, chromosome);
 
     srand(time(NULL));
 
@@ -364,14 +311,6 @@ static PyObject * realGeneticModelSolver(realGeneticModelObject *self, PyObject 
         self->individual[i].evaluated = True;
 
         Py_DECREF(fitValue);
-
-        soma = 0;
-        for(j = 0; j < self->chromosome.length; j++)
-        {
-            soma += self->individual[i].gene[j]*self->individual[i].gene[j];
-        }
-        self->individual[i].fit = soma;
-        self->individual[i].evaluated = True;
     }
 
     for(g = 1; g <= self->population.maxGenerations; g++)
@@ -764,6 +703,81 @@ static boolean realReplacementModelVerifySettings(realReplacementModel *replacem
     {
         PyErr_SetString(geneticError, "The replacementType provided cannot be recognized.");
         return False;
+    }
+
+    return True;
+}
+
+static boolean realMemoryAllocSolver(realGeneticModelObject *self, realChromosome *totalPopulation, realChromosome ****parents, PyObject **chromosome, PyObject **fitArg)
+{
+    int i;
+
+    //Memory allocation to totalPopulation gene
+    for(i = 0; i < self->population.maxIndividuals; i++)
+    {
+        totalPopulation[i].gene = (double *) malloc(self->chromosome.length*sizeof(double));
+        if(totalPopulation[i].gene == NULL)
+        {
+            PyErr_NoMemory();
+            return False;
+        }
+    }
+
+    //Memory allocation to parents
+    *parents = (realChromosome ***) malloc((self->population.totalFamilies)*sizeof(realChromosome **));
+    if(*parents == NULL)
+    {
+        PyErr_NoMemory();
+        return False;
+    }
+
+    for(i = 0; i < self->population.totalFamilies; i++)
+    {
+        (*parents)[i] = (realChromosome **) malloc((self->population.totalParents)*sizeof(realChromosome *));
+        if((*parents)[i] == NULL)
+        {
+            PyErr_NoMemory();
+            return False;
+        }
+    }
+
+    //Initialization of the Python tuple args for fitFunction
+    *chromosome = PyTuple_New(self->chromosome.length);
+    if(*chromosome == NULL)
+    {
+        return False;
+    }
+
+    *fitArg = PyTuple_New(1);
+    if(*fitArg == NULL)
+    {
+        Py_DECREF(*chromosome);
+        return False;
+    }
+    PyTuple_SetItem(*fitArg, 0, *chromosome);
+
+    return True;
+}
+
+static boolean realMemoryAllocIndividuals(realGeneticModelObject *self)
+{
+    int i;
+
+    self->individual = (realChromosome *) malloc(self->population.size*sizeof(realChromosome));
+    if(self->individual == NULL)
+    {
+        PyErr_NoMemory();
+        return False;
+    }
+
+    for(i = 0; i < self->population.size; i++)
+    {
+        self->individual[i].gene = (double *) malloc(self->chromosome.length*sizeof(double));
+        if(self->individual[i].gene == NULL)
+        {
+            PyErr_NoMemory();
+            return False;
+        }
     }
 
     return True;

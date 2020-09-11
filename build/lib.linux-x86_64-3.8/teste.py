@@ -7,13 +7,13 @@ def fitFunction(chrom):
 
     return soma
 
-model = gOpt.realCodificationModel(objective= 'max', fitFunction= fitFunction,
-                                   maxGenerations= 10, populationSize= 6, totalFamilies= 3, totalParents= 2, childrensPerFamily= 2,
+model = gOpt.realCodificationModel(objective= 'min', fitFunction= fitFunction,
+                                   maxGenerations= 100, populationSize= 50, totalFamilies= 25, totalParents= 2, childrensPerFamily= 2,
                                    chromosomeLength= 7,
                                    initType= 'uniformRandom',
                                    selectionType= 'tournament',
                                    crossoverType= '3-Point', crossoverProb= 0.995,
-                                   mutationType= 'uniformRandom', mutationProb= 0, alleleMutationProb= 0.001,
+                                   mutationType= 'uniformRandom', mutationProb= 0.008, alleleMutationProb= 0.001,
                                    replacementType= 'elitist')
 
 model.Solve()

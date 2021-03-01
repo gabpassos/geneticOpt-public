@@ -3,13 +3,13 @@ import geneticOpt as gOpt
 def fitFunction(chrom):
     soma = 0
     for i in range(7):
-        soma = soma + chrom(i)**2
+        soma = soma + chrom[i]**2
 
     return soma
 
 model = gOpt.realCodificationModel(objective= 'min', fitFunction= fitFunction,
-                                   maxGenerations= 100, populationSize= 20, totalFamilies= 10, totalParents= 2, childrensPerFamily= 2,
-                                   chromosomeLength= 7,
+                                   maxGenerations= 10000, populationSize= 500, totalFamilies= 250, totalParents= 2, childrensPerFamily= 2,
+                                   chromosomeLength= 1000,
                                    initType= 'uniformRandom',
                                    selectionType= 'tournament',
                                    crossoverType= '3-Point', crossoverProb= 0.98,
